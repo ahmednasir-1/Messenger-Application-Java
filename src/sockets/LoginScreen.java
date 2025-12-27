@@ -38,7 +38,16 @@ public class LoginScreen extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                Client.login(usernameTextField.getText(), password.getText());
+                boolean success = Client.login(usernameTextField.getText(), passwordTextField.getText());
+                if(success)
+                {
+                        dispose();
+
+                        ChatScreen chat = new ChatScreen();
+                        chat.setVisible(true);
+
+                        Client.startListener(chat);
+                }
             }
         });
 

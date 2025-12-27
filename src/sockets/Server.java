@@ -6,10 +6,16 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
 
-    static ArrayList<String> onlineUsers = new ArrayList<>();
+
+    public static Map<String, ClientThread> onlineUsers =
+            new ConcurrentHashMap<>();
+
+
 
     public static void main() {
         try {

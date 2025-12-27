@@ -11,8 +11,8 @@ public class SignupScreen extends JFrame {
     JTextField nameTextField = new JTextField(20);
     JLabel username = new JLabel("Enter your username: ");
     JLabel password = new JLabel("Password: ");
-    JTextField usernameTextField = new JTextField(20);
-    JTextField passwordTextField = new JTextField(20);
+    JTextField usernameTextField = new JTextField(10);
+    JTextField passwordTextField = new JTextField(10);
     JButton signupButton = new JButton("Confirm");
     JButton cancelButton = new JButton("Cancel");
     JButton chooseAFileButton = new JButton("Choose a File");
@@ -41,11 +41,12 @@ public class SignupScreen extends JFrame {
         jp.add(name);
         jp.add(nameTextField);
 
+        jp.add(username);
+        jp.add(usernameTextField);
+
         jp.add(password);
         jp.add(passwordTextField);
 
-        jp.add(username);
-        jp.add(usernameTextField);
 
         jp.add(signupButton);
         jp.add(cancelButton);
