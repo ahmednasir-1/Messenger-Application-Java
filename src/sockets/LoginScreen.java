@@ -43,7 +43,8 @@ public class LoginScreen extends JFrame {
                 {
                         dispose();
 
-                        ChatScreen chat = new ChatScreen();
+                        String username = usernameTextField.getText();
+                        ChatScreen chat = new ChatScreen(username);
                         chat.setVisible(true);
 
                         Client.startListener(chat);

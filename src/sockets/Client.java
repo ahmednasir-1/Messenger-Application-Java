@@ -6,6 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Client {
 
@@ -94,16 +97,41 @@ public class Client {
         }
     }
 
-    public static void sendRequest(String sender)
-    {
-        try{
-            dos.writeUTF("FriendRequest");
+    public static void sendFile(String receiver, String sender, File file) {
+        try {
+            dos.writeUTF("File");
+            dos.writeUTF(receiver);
             dos.writeUTF(sender);
+            dos.writeUTF(file.getName());
+
+            long fileSize = file.length();
+            dos.writeLong(fileSize);
+
+            FileInputStream fis = new FileInputStream(file);
+
+            // sending file in the form of 4KB chunks
+            byte[] buffer = new byte[4096];
+
+            int bytesRead;
+
+            while ((bytesRead = fis.read(buffer)) != -1) {
+                dos.write(buffer, 0, bytesRead);
+            }
+
+            dos.flush();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void sendRequest(String toWhom) {
+        try {
+            dos.writeUTF("FriendRequest");
+            dos.writeUTF(toWhom);
 //            dos.writeUTF(user);
             dos.flush();
-        }
-        catch(IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -120,24 +148,58 @@ public class Client {
                     String command = dis.readUTF();
 
                     System.out.println(command + "command in listener thread");
-                    if(command.equalsIgnoreCase("rmessage"))
-                    {
+                    if (command.equalsIgnoreCase("rmessage")) {
                         String sender = dis.readUTF();
                         String message = dis.readUTF();
 
-                        SwingUtilities.invokeLater(()->{
+                        SwingUtilities.invokeLater(() -> {
                             chat.displayMessage(sender, message);
                         });
                     }
 
-                    if(command.equalsIgnoreCase("FriendRequest"))
-                    {
-                        String sender = dis.readUTF();
+                    if (command.equalsIgnoreCase("FriendRequest")) {
+                        String s = dis.readUTF();
+                        String from = dis.readUTF();
 
-                        SwingUtilities.invokeLater(()->{
-                            chat.friendRequestDialogBox(sender);
+                        SwingUtilities.invokeLater(() -> {
+                            chat.friendRequestDialogBox(s, from);
                         });
                     }
+
+
+                    if (command.equalsIgnoreCase("FILE")) {
+
+                        String from = dis.readUTF();      // sender username
+                        String fileName = dis.readUTF();
+                        long fileSize = dis.readLong();
+
+                        Path saveDir = Paths.get("downloads", from);
+                        Files.createDirectories(saveDir);
+
+                        Path filePath = saveDir.resolve(
+                                System.currentTimeMillis() + "_" + fileName);
+
+                        FileOutputStream fos = new FileOutputStream(filePath.toFile());
+
+                        byte[] buffer = new byte[4096];
+                        long remaining = fileSize;
+                        int bytesRead;
+
+                        while (remaining > 0 &&
+                                (bytesRead = dis.read(buffer, 0,
+                                        (int)Math.min(buffer.length, remaining))) != -1) {
+
+                            fos.write(buffer, 0, bytesRead);
+                            remaining -= bytesRead;
+                        }
+
+                        fos.close();
+
+                        System.out.println("File received from " + from +
+                                " → " + filePath);
+                    }
+
+
                 }
 
             } catch (IOException e) {

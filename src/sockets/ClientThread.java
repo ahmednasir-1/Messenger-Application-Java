@@ -81,7 +81,21 @@ public class ClientThread extends Thread {
 
                     String sender = dis.readUTF();
                     dos.writeUTF("FriendRequest");
+                    dos.writeUTF(username);
                     dos.writeUTF(sender);
+
+                } else if (type.equals("File")) {
+
+                    String receiver = dis.readUTF();
+                    String sender = dis.readUTF();
+                    String fileName = dis.readUTF();
+                    long fileSize = dis.readLong();
+
+                    dos.writeUTF("File");
+                    dos.writeUTF(username);
+//                    dos.writeUTF(receiver);
+                    dos.writeUTF(fileName);
+                    dos.writeLong(fileSize);
 
                 }
 
