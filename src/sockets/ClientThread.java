@@ -25,8 +25,8 @@ public class ClientThread extends Thread {
 
     public void run() {
         try {
-             dos = new DataOutputStream(socket.getOutputStream());
-             dis = new DataInputStream(socket.getInputStream());
+            dos = new DataOutputStream(socket.getOutputStream());
+            dis = new DataInputStream(socket.getInputStream());
 
             while (true) {
                 String type = dis.readUTF();
@@ -57,12 +57,22 @@ public class ClientThread extends Thread {
                     if (isValid) {
                         Server.onlineUsers.put(username, this);
                         dos.writeUTF("Login_Success");
+
+                        broadcastOnlineUsers();
                     } else {
                         dos.writeUTF("Login_Failed");
                     }
 
 
-                } else if (type.equals("Message")) {
+                }
+                else if(type.equals("Logout"))
+                {
+                    String user = dis.readUTF();
+                    Server.onlineUsers.remove(user);
+
+                    broadcastOnlineUsers();
+
+                }else if (type.equals("Message")) {
                     String receiver = dis.readUTF();
                     String message = dis.readUTF();
 
@@ -79,10 +89,15 @@ public class ClientThread extends Thread {
                     }
                 } else if (type.equalsIgnoreCase("FriendRequest")) {
 
-                    String sender = dis.readUTF();
-                    dos.writeUTF("FriendRequest");
-                    dos.writeUTF(username);
-                    dos.writeUTF(sender);
+                    String receiver = dis.readUTF();
+
+                    ClientThread receiverThread = Server.onlineUsers.get(receiver);
+                    if (receiverThread != null) {
+                        receiverThread.dos.writeUTF("request");
+                        receiverThread.dos.writeUTF(username);
+//                        dos.writeUTF(sender);
+
+                    }
 
                 } else if (type.equals("File")) {
 
@@ -91,14 +106,32 @@ public class ClientThread extends Thread {
                     String fileName = dis.readUTF();
                     long fileSize = dis.readLong();
 
-                    dos.writeUTF("File");
-                    dos.writeUTF(username);
+                    ClientThread receiverThread = Server.onlineUsers.get(receiver);
+                    if (receiverThread != null) {
+                        receiverThread.dos.writeUTF("File");
+                        receiverThread.dos.writeUTF(sender);
 //                    dos.writeUTF(receiver);
-                    dos.writeUTF(fileName);
-                    dos.writeLong(fileSize);
+                        receiverThread.dos.writeUTF(fileName);
+                        receiverThread.dos.writeLong(fileSize);
+
+                        byte[] buffer = new byte[4096];
+                        long remaining = fileSize;
+                        int bytesRead;
+
+                        while (remaining > 0 &&
+                                (bytesRead = dis.read(buffer, 0,
+                                        (int)Math.min(buffer.length, remaining))) != -1) {
+
+                            receiverThread.dos.write(buffer, 0, bytesRead);
+                            remaining -= bytesRead;
+                        }
+
+                        System.out.println("file send in client thread route from " + username);
+
+                    }
+
 
                 }
-
 
             }
 
@@ -117,6 +150,30 @@ public class ClientThread extends Thread {
             dos.flush();
 
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void broadcastOnlineUsers()
+    {
+        try {
+
+            String[] users = Server.onlineUsers.keySet().toArray(new String[0]);
+
+            for (ClientThread ct : Server.onlineUsers.values()) {
+                ct.dos.writeUTF("OnlineUsersList");
+                ct.dos.writeInt(users.length);
+
+                for(String user : users)
+                {
+                    ct.dos.writeUTF(user);
+                }
+
+                ct.dos.flush();
+
+            }
+        }catch (IOException e)
+        {
             e.printStackTrace();
         }
     }

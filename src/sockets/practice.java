@@ -33,7 +33,21 @@ public class practice extends JFrame {
         setVisible(true);
     }
 
+
+
+    public static void good()
+    {
+        List users = new List();
+        users.add("ali");
+        users.add("ahmed");
+
+        for(int i=0 ;i< users.getItemCount(); i++)
+        {
+            System.out.println(users.getSelectedIndex());
+        }
+    }
+
     public static void main() {
-        new practice();
+        practice.good();
     }
 }

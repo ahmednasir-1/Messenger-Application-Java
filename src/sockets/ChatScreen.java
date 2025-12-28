@@ -9,12 +9,12 @@ import java.io.File;
 public class ChatScreen extends JFrame {
 
     // online users list
-    String[] list = {"ahmed", "musavir123"};
+    String[] list  = {""};
 
     JComboBox<String> onlineUsers = new JComboBox<>(list);
     JLabel send = new JLabel();
     JLabel receiver = new JLabel("Receiver");
-    JButton sendMessageButton = new JButton("Send");
+    JButton sendMessageButton = new JButton("Send Message");
 
     JTextField sendMessageTextField = new JTextField(20);
     JTextField receiveMessageTextField = new JTextField(20);
@@ -23,7 +23,7 @@ public class ChatScreen extends JFrame {
     JPanel panel = new JPanel();
 
     //    String[] allUsersList = {"ahmed", "usman"};
-    JComboBox<String> friendsList = new JComboBox<>(list);
+//    JComboBox<String> friendsList = new JComboBox<>(list);
     String selectFriend;
     JButton sendRequestButton = new JButton("Send Request");
     JButton acceptButton = new JButton("Accept");
@@ -90,6 +90,7 @@ public class ChatScreen extends JFrame {
         });
 
 
+
         panel.add(sendFileButton);
         sendFileButton.addActionListener(new ActionListener() {
             @Override
@@ -115,21 +116,32 @@ public class ChatScreen extends JFrame {
         });
 
 
-        panel.add(friendsList);
+//        panel.add(friendsList);
 
-        // user selects the friend who he wants to send the friend request
-        friendsList.addActionListener(new ActionListener() {
+
+        panel.add(logoutButton);
+        logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectFriend = (String) friendsList.getSelectedItem();
+                Client.logoutUser(username);
+                dispose();
             }
         });
+//        // user selects the friend who he wants to send the friend request
+//        friendsList.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                selected = (String) onlineUsers.getSelectedItem();
+//            }
+//        });
 
         panel.add(sendRequestButton);
         sendRequestButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Client.sendRequest(selectFriend);
+
+                // select friend is a receiver
+                Client.sendRequest(selected);
             }
         });
         add(panel);
@@ -143,12 +155,28 @@ public class ChatScreen extends JFrame {
     }
 
     // when user receives friend request
-    public void friendRequestDialogBox(String sender, String from) {
-        JOptionPane.showMessageDialog(null, sender + " wants to send you a friend request." + "From: " + sender);
+    public void friendRequestDialogBox(String sender) {
+        JOptionPane.showMessageDialog(null, sender + " wants to send you a friend request.");
 //        panel.add(acceptButton);
 //        panel.add(declineButton);
     }
 
+    public void updateOnlineUsers(String[] users)
+    {
+        onlineUsers.removeAllItems();
+
+        for (String user : users) {
+//            if (!user.equals(username)) { // Optional: skip self
+                onlineUsers.addItem(user);
+//            }
+        }
+    }
+
+
+    public void fileAlert()
+    {
+        JOptionPane.showMessageDialog(null, "You received a file");
+    }
     public static void main() {
         new ChatScreen("ali");
     }

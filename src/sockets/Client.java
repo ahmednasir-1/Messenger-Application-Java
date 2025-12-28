@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class Client {
 
@@ -125,15 +126,29 @@ public class Client {
         }
     }
 
-    public static void sendRequest(String toWhom) {
+    public static void sendRequest(String receiver) {
         try {
             dos.writeUTF("FriendRequest");
-            dos.writeUTF(toWhom);
+            dos.writeUTF(receiver);
 //            dos.writeUTF(user);
             dos.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+    }
+
+    public static void logoutUser(String user)
+    {
+        try{
+            dos.writeUTF("Logout");
+            dos.writeUTF(user);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -157,27 +172,28 @@ public class Client {
                         });
                     }
 
-                    if (command.equalsIgnoreCase("FriendRequest")) {
-                        String s = dis.readUTF();
-                        String from = dis.readUTF();
+                    if (command.equalsIgnoreCase("request")) {
+                        String sender = dis.readUTF();
+//                        String from = dis.readUTF();
 
                         SwingUtilities.invokeLater(() -> {
-                            chat.friendRequestDialogBox(s, from);
+                            chat.friendRequestDialogBox(sender);
                         });
                     }
 
 
-                    if (command.equalsIgnoreCase("FILE")) {
+                    if (command.equalsIgnoreCase("File")) {
 
-                        String from = dis.readUTF();      // sender username
+                        String from = dis.readUTF();// sender username
+                        System.out.println("in listener thread from "+ from);
                         String fileName = dis.readUTF();
+                        System.out.println("in listener thread from " + fileName);
                         long fileSize = dis.readLong();
 
-                        Path saveDir = Paths.get("downloads", from);
+                        Path saveDir = Paths.get("downloads");
                         Files.createDirectories(saveDir);
 
-                        Path filePath = saveDir.resolve(
-                                System.currentTimeMillis() + "_" + fileName);
+                        Path filePath = saveDir.resolve(fileName);
 
                         FileOutputStream fos = new FileOutputStream(filePath.toFile());
 
@@ -197,6 +213,23 @@ public class Client {
 
                         System.out.println("File received from " + from +
                                 " → " + filePath);
+                    }
+
+                    if(command.equals("OnlineUsersList"))
+                    {
+                        int count = dis.readInt();
+                        String[] users = new String[count];
+
+                        for(int i=0; i<count; i++)
+                        {
+                            users[i] = dis.readUTF();
+                            System.out.println("users: " + users[i]);
+                        }
+
+
+                        SwingUtilities.invokeLater(()->{
+                            chat.updateOnlineUsers(users);
+                        });
                     }
 
 
