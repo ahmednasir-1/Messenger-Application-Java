@@ -84,7 +84,10 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return response.equals("Login_Success");
+        if(response.equals("Login_Success"))
+                return true;
+        else
+                return false;
     }
 
     public static void sendMessage(String text, String receiver) {
@@ -162,7 +165,8 @@ public class Client {
                 while (true) {
                     String command = dis.readUTF();
 
-                    System.out.println(command + "command in listener thread");
+//                    System.out.println(command + "command in listener thread");
+
                     if (command.equalsIgnoreCase("rmessage")) {
                         String sender = dis.readUTF();
                         String message = dis.readUTF();
@@ -191,6 +195,7 @@ public class Client {
                         long fileSize = dis.readLong();
 
                         Path saveDir = Paths.get("downloads");
+                        // if doesnot exit, create that directory
                         Files.createDirectories(saveDir);
 
                         Path filePath = saveDir.resolve(fileName);
@@ -212,7 +217,11 @@ public class Client {
                         fos.close();
 
                         System.out.println("File received from " + from +
-                                " → " + filePath);
+                                " - " + filePath);
+
+                        SwingUtilities.invokeLater(()->{
+                            chat.fileMessage(from);
+                        });
                     }
 
                     if(command.equals("OnlineUsersList"))
@@ -223,7 +232,7 @@ public class Client {
                         for(int i=0; i<count; i++)
                         {
                             users[i] = dis.readUTF();
-                            System.out.println("users: " + users[i]);
+//                            System.out.println("users: " + users[i]);
                         }
 
 

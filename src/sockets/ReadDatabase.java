@@ -29,22 +29,22 @@ public class ReadDatabase {
     }
 
     public boolean validateCredentials(String user, String pass) {
-//        boolean flag;
-        User u = new User();
+//        String s2 = null;
+        String s2 = null;
         try {
             Connection con = DriverManager.getConnection(url, username, password);
             Statement stat = con.createStatement();
             String query =
-                    "Select * from `messenger`.`userinfo` where `userinfo`.`username` = \"" +
-                            user + "\" && `userinfo`.`password` = \"" +
-                            pass + "\"";
+                    "Select `userinfo`.`password` from `messenger`.`userinfo` where `userinfo`.`username` = \"" + user + "\"";
             ResultSet rs = stat.executeQuery(query);
-            while (rs.next()) {
-                u.setName(rs.getString("Name"));
-                System.out.println(u.getName());
-                u.setFileName(rs.getString("fileName"));
-                System.out.println(u.getName());
+            if(rs.next()) {
+
+                s2 = rs.getString("password");
             }
+            else {
+                return false;
+            }
+
 
             stat.close();
             con.close();
@@ -52,13 +52,9 @@ public class ReadDatabase {
             e.printStackTrace();
         }
 
-//        if (u.getName().equalsIgnoreCase("")) {
-//            System.out.println("invalid");
-//            return false;
-//        } else {
-//            System.out.println("valid");
-            return true;
-//        }
+
+            return s2.equals(pass);
+
     }
 
 }

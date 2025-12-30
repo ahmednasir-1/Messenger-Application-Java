@@ -85,7 +85,10 @@ public class ClientThread extends Thread {
                     if (receiverThread != null) {
                         // Forward message
                         System.out.println("forwarded");
-                        receiverThread.sendMessage(username, message);
+                        receiverThread.dos.writeUTF("rmessage");
+                        receiverThread.dos.writeUTF(username);
+                        receiverThread.dos.writeUTF(message);
+                        receiverThread.dos.flush();
                     }
                 } else if (type.equalsIgnoreCase("FriendRequest")) {
 
@@ -141,18 +144,7 @@ public class ClientThread extends Thread {
         }
     }
 
-    public void sendMessage(String sender, String message) {
 
-        try {
-            dos.writeUTF("rmessage");
-            dos.writeUTF(sender);
-            dos.writeUTF(message);
-            dos.flush();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void broadcastOnlineUsers()
     {

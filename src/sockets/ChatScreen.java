@@ -166,17 +166,17 @@ public class ChatScreen extends JFrame {
         onlineUsers.removeAllItems();
 
         for (String user : users) {
-//            if (!user.equals(username)) { // Optional: skip self
                 onlineUsers.addItem(user);
 //            }
         }
     }
 
 
-    public void fileAlert()
+    public void fileMessage(String sender)
     {
-        JOptionPane.showMessageDialog(null, "You received a file");
+        JOptionPane.showMessageDialog(null, "You received a file from " + sender );
     }
+
     public static void main() {
         new ChatScreen("ali");
     }

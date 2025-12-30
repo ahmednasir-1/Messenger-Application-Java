@@ -49,6 +49,9 @@ public class LoginScreen extends JFrame {
 
                         Client.startListener(chat);
                 }
+                else{
+                    JOptionPane.showMessageDialog(null, "Invalid Credentials");
+                }
             }
         });
 

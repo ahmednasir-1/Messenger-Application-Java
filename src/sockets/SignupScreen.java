@@ -55,6 +55,7 @@ public class SignupScreen extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                dispose();
                 Client.signup(name.getText(), username.getText(), password.getText());
                 dispose();
                 new LoginScreen();
