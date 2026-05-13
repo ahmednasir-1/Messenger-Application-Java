@@ -3,9 +3,9 @@ package sockets;
 import java.sql.*;
 
 public class ReadDatabase {
-    private final String username = "root";
-    private final String password = "ahmed123";
-    private final String url = "jdbc:mysql://127.0.0.1:3306/messenger";
+    private final String username = "";
+    private final String password = "";
+    private final String url = "";
 
 
     public void saveDataOfUser(User u) {
